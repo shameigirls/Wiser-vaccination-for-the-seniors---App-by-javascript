@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<script src='dist/fhir-client-v2.js'></script>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"></link>
+  <link href="main.css" rel="stylesheet"></link>
+
+</head>
+
+<body>
+
+  <h2>Welcome to Wiser Vaccination</h2>
+  <p style="color:#DBA901">We care for the elder's immunization and health.</p>
+  <h5 id="Hello">Hi!</h5>  
+  <div id="main">
+
+    <div class="input">    
+      <p id="age">age</p> 
+    </div>
+
+    <div id = "check_pregnant" class="input" hidden>    
+      <p >Are you pregnant? (Optional)&nbsp; &nbsp;</p>
+                  <input name="pregnant" type="radio" onclick="pregnant()">  Yes &nbsp;
+                  <input name="pregnant" type="radio" >  No
+    </div>
+
+
+
+    <div class="input">    
+      <label><div class="input-title">Influenza
+        <div><a href="https://www.cdc.gov/flu/" style="color:blue"><u>for more info</u></a></div>
+        </div></label>
+      <div class="btn-group btn-group-toggle" data-toggle="buttons">
+          <label class="btn btn-primary" v-bind:class="isActive(flu,'0')">
+            <input type="checkbox" name="flu" v-model="flu" v-bind:value="0"> Not Recommended at your age
+          </label>
+          <label class="btn btn-primary" v-bind:class="isActive(flu,'1')">
+            <input type="checkbox" name="flu" v-model="flu" v-bind:value="1">  Vaccinated
+          </label>
+          <label class="btn btn-primary" v-bind:class="isActive(flu,'2')">
+            <input type="checkbox" name="flu" v-model="flu" v-bind:value="2"> Allergy/special condition
+          </label>
+          <label id="flucomment" class="btn btn-primary" v-bind:class="isActive(flu,'3')">
+            <input  type="checkbox" name="flu" v-model="flu" v-bind:value="3"> Recommended
+          </label>
+      </div>
+    </div>
+
+
+
+    <div class="input">    
+      <label><div class="input-title">Herpes zoster (RZV/ZVL)
+        <div><a href="https://www.cdc.gov/vaccinesafety/vaccines/shingles-herpes-vaccine.html" style="color:blue"><u>for more info</u></a></div>
+        </div></label>
+      <div class="btn-group btn-group-toggle" data-toggle="buttons">
+          <label class="btn btn-primary" v-bind:class="isActive(zoster,'0')">
+            <input type="checkbox" name="zoster" v-model="zoster" v-bind:value="0"> Not Recommended at your age
+          </label>
+          <label class="btn btn-primary" v-bind:class="isActive(zoster,'1')">
+            <input type="checkbox" name="zoster" v-model="zoster" v-bind:value="1">  Vaccinated
+          </label>
+          <label class="btn btn-primary" v-bind:class="isActive(zoster,'2')">
+            <input id="zoster_condition" type="checkbox" name="zoster" v-model="zoster" v-bind:value="2"> Allergy/special condition
+          </label>
+          <label id="zostercomment" class="btn btn-primary" v-bind:class="isActive(zoster,'3')">
+            <input type="checkbox" name="zoster" v-model="zoster" v-bind:value="3"> Recommended
+          </label>
+      </div>
+    </div>
+
+
+    <div class="input">    
+      <label><div class="input-title">Tetanus (Tdap/Td)
+        <div><a href="https://www.cdc.gov/vaccines/vpd/tetanus/index.html" style="color:blue"><u>for more info</u></a></div>
+        </div></label>
+      <div class="btn-group btn-group-toggle" data-toggle="buttons">
+          <label class="btn btn-primary" v-bind:class="isActive(tdap,'0')">
+            <input type="checkbox" name="tdap" v-model="tdap" v-bind:value="0"> Not Recommended at your age
+          </label>
+          <label class="btn btn-primary" v-bind:class="isActive(tdap,'1')">
+            <input type="checkbox" name="tdap" v-model="tdap" v-bind:value="1">  Vaccinated
+          </label>
+          <label class="btn btn-primary" v-bind:class="isActive(tdap,'2')">
+            <input type="checkbox" name="tdap" v-model="tdap" v-bind:value="2"> Allergy/special condition
+          </label>
+          <label id="tdapcomment" class="btn btn-primary" v-bind:class="isActive(tdap,'3')">
+            <input type="checkbox" name="tdap" v-model="tdap" v-bind:value="3"> Recommended
+          </label>
+      </div>
+    </div>
+
+
+    <div class="input">    
+      <label><div class="input-title">Pneumococcal conjugate (PCV13)
+        <div><a href="https://www.cdc.gov/vaccines/vpd/pneumo/hcp/PCV13-adults.html" style="color:blue"><u>for more info</u></a></div>
+        </div></label>
+      <div class="btn-group btn-group-toggle" data-toggle="buttons">
+          <label class="btn btn-primary" v-bind:class="isActive(pcv13,'0')">
+            <input type="checkbox" name="pcv13" v-model="pcv13" v-bind:value="0"> Not Recommended at your age
+          </label>
+          <label class="btn btn-primary" v-bind:class="isActive(pcv13,'1')">
+            <input type="checkbox" name="pcv13" v-model="pcv13" v-bind:value="1">  Vaccinated
+          </label>
+          <label class="btn btn-primary" v-bind:class="isActive(pcv13,'2')">
+            <input type="checkbox" name="pcv13" v-model="pcv13" v-bind:value="2"> Allergy/special condition
+          </label>
+          <label id="pcvcomment" id = "test" class="btn btn-primary" v-bind:class="isActive(pcv13,'3')">
+            <input type="checkbox" name="pcv13" v-model="pcv13" v-bind:value="3"> Recommended
+          </label>
+      </div>
+    </div>
+
+    <div class="input">
+* This is not medical advice.  Please check with your doctor for desicions.<br>
+* Not all contraindications are checked. "Allergy/Condition" only applies automatically to egg allergy and HIV infection. <br>
+* "Vaccinated" is checked only if you are vaccinated within the suggested time period.
+    </div>
+
+
+  </div>
+
+
+	<script>
+
+		var myApp = {}
+    myApp.data = {}
+    myApp.requestData = {}
+
+//defaults are 3 for each vaccine, so they will be recommended if there are not other elements added (means there are not "not recommend" things happend)
+    myApp.data.flu = ['3']
+    myApp.data.zoster = ['3']
+    myApp.data.tdap = ['3']
+    myApp.data.pcv13 = ['3']
+
+    renderVue()
+
+    function renderVue(){
+      myApp.vue = new Vue({
+        el: "#main",
+        data: myApp.data,
+        methods:{
+          isActive: function(arg1, arg2){
+          // In general, if there are other elements, that means there are "not recommend" things happend, the vaccine won't be recommended. But when pragnancy happend, tdap should be recommended, the new "3" added won't be removed
+          if (arg1.length>1 & arg1.indexOf('3')==0){ arg1.shift()}
+          if (arg1.indexOf(arg2)>-1){ return "active" } 
+          else {return ""}
+          }
+        }
+      })
+    }
+
+
+
+    FHIR.oauth2.ready()
+    .then(function(client){ 
+      myApp.smart = client
+      doRequests()
+    })
+
+    function doRequests(){
+
+//patient
+      myApp.smart.patient.read().then(function(data) {
+        myApp.requestData.patient = data
+        computepatient()
+//immunization
+      myApp.smart.request("Immunization?patient="+myApp.smart.patient.id).then
+      (function(data) {
+        myApp.requestData.immunization = data
+        computeVaccinationrecord()       
+      })
+
+      })    
+
+//allergy
+      myApp.smart.request("AllergyIntolerance?patient="+myApp.smart.patient.id).then
+      (function(data) {
+        myApp.requestData.allergy = data
+        computeallergy()       
+      })
+
+
+//all conditions that are diagnoses
+      myApp.smart.request("Condition?patient="+myApp.smart.patient.id+"&category=diagnosis").then(function(data) {
+        myApp.requestData.conditions = data
+        computecondition()
+      })
+    }
+
+
+
+    function computepatient(){
+      var age = moment().diff( moment(myApp.requestData.patient.birthDate, "YYYY-MM-DD"), "year")
+      $("#age").html("Age: "+age)
+
+      if (myApp.requestData.patient.gender=="female") {
+      $("#Hello").html("Hi! "+"Ms."+"&nbsp"+myApp.requestData.patient.name[0].given[0]+"&nbsp"+myApp.requestData.patient.name[0].family[0]) 
+      check_pregnant.hidden=false
+      }
+      else{
+      $("#Hello").html("Hi! "+"Mr."+myApp.requestData.patient.name[0].given[0]+"&nbsp"+myApp.requestData.patient.name[0].family[0])   
+      }
+
+      if (moment().diff( moment(myApp.requestData.patient.birthDate, "YYYY-MM-DD"), "month") < 6) {
+        myApp.data.flu.push("0")
+      }
+      if (age < 50){
+          myApp.data.zoster.push("0")}
+      else if (age <60){
+          $("#zostercomment").html("RZV preferably recomended, plese don't take ZVL")
+          }
+      if (age < 11){
+          myApp.data.tdap.push("0")}      
+      if (age>=65) {
+      $("#pcvcomment").html("Recommended based on shared clinical decision-making")
+      }
+      
+    }
+
+
+
+    function computeallergy(){
+      //no results keep ""
+     if (!myApp.requestData.allergy || !myApp.requestData.allergy.entry){ return false }
+// https://browser.ihtsdotools.org/
+     var eggallergy = ['91930004','414074006','102263004']
+     var eggallergyArray = []
+      _.each(myApp.requestData.allergy.entry, function(val,index){
+        // fhir usually just put text for food allergy, sometimes with sct codes
+        if(val.resource.substance.text.indexOf("egg")>-1){
+          eggallergyArray.push(val.resource.substance.text)
+          console.log(val)
+        } 
+        else{
+        _.each(val.resource.substance.coding, function(v,i){
+          if (v.system === "http://snomed.info/sct"){
+            if (_.indexOf(eggallergy, v.code) > -1 ){
+              eggallergyArray.push(v.code)
+              }
+          }
+        })
+      } 
+      })  
+     if (eggallergyArray.length > 0){
+        $("#flucomment").html("Recommended under supervision of health care provider <p>if reaction of your egg allergy is more severe than hives </p>")       
+      }
+
+
+    }
+
+    function computecondition() {
+//no results keep ""
+      if (!myApp.requestData.conditions || !myApp.requestData.conditions.entry){ return false } 
+// google scholar https://journals.lww.com/jaids/fulltext/2014/05010/HIV_Infection_and_Its_Association_With_an_Excess.12.aspx https://wonder.cdc.gov/wonder/prevguid/m0032908/m0032908.asp
+      var desiredICD10Codes = ["042"]
+      var desiredICD9Codes = ["B20", "B21", "B23","B24"]      
+
+      var hivArray = []
+      _.each(myApp.requestData.conditions.entry, function(val,index){
+        _.each(val.resource.code.coding, function(v,i){
+          if (v.system === "http://hl7.org/fhir/sid/icd-10-cm"){
+            if (_.indexOf(desiredICD10Codes, v.code) > -1 ){
+              hivArray.push(v.code)
+            }
+          }
+          if (v.system === "http://hl7.org/fhir/sid/icd-9-cm"){
+            if (_.indexOf(desiredICD9Codes, v.code) > -1 ){
+              hivArray.push(v.code)
+            }
+          }
+        })
+      })
+      if (hivArray.length > 0){
+                myApp.data.zoster.push('2')
+                $("#flucomment").append(" (Note LAIV should not be used)")  
+            }
+    }
+
+   function computeVaccinationrecord(){
+     computefluVR()
+     computezosterVR()
+     computeTdapVR()
+     computePCV13VR()
+        
+//Influenza
+     function computefluVR(){
+//no results keep ""
+     if (!myApp.requestData.immunization || !myApp.requestData.immunization.entry){ return false }
+
+// locate the cvx code for Influenza
+     var influenzacvx = ['125', '126', '127', '128', '16', '88', '168', '15', '155', '185', '141', '140', '144', '194', '160', '151', '123', '135', '197', '153', '171', '186', '158', '150', '161', '166', '111', '149']
+      
+//filter the check within 365 days
+     flu365 = _.filter(myApp.requestData.immunization.entry, function(val,index){
+        var now = moment()
+        var periodStart = moment(val.resource.date, "YYYY-MM-DDTHH:mm:ss.sssZ")
+        var days = now.diff(periodStart, "days")
+        console.log(periodStart.format("MM-DD-YYYY"), days)
+        if (days < 365){ return val }
+      })
+
+     var fluArray = []
+      _.each(flu365, function(val,index){
+        _.each(val.resource.vaccineCode.coding, function(v,i){
+          if (v.system === "http://hl7.org/fhir/sid/cvx"){
+            if (_.indexOf(influenzacvx, v.code) > -1 ){
+              fluArray.push(v.code)}
+          }
+        })
+      })
+
+     if (fluArray.length > 0){
+          myApp.data.flu.push("1")
+      } 
+     }
+
+
+//Zoster
+     function computezosterVR(){
+
+// filter the time with limitaion 50+
+     zoster50 = _.filter(myApp.requestData.immunization.entry, function(val,index){
+        var bday = moment(myApp.requestData.patient.birthDate, "YYYY-MM-DD")
+        var add50years = bday.add(50, 'years');
+        var vaccidate = moment(val.resource.date);
+        var diff = add50years.diff(vaccidate, "days")
+        if (diff < 0){ return val }
+      })
+
+// locate the cvx code for RZV and ZVL
+     var zostercvx = ['187', '121']
+     var zosterArray = []
+      _.each(zoster50, function(val,index){
+        _.each(val.resource.vaccineCode.coding, function(v,i){
+          if (v.system === "http://hl7.org/fhir/sid/cvx"){
+            if (_.indexOf(zostercvx, v.code) > -1 ){
+              zosterArray.push(v.code)}
+          }
+        })
+      })
+
+     if (zosterArray.length > 0){
+          myApp.data.zoster.push('1')
+          }
+    }
+
+
+
+// Tetanus
+     function computeTdapVR(){
+
+// filter the time with latest 10 years
+     tdap10 = _.filter(myApp.requestData.immunization.entry, function(val,index){
+        var ago10years = moment().subtract(10, 'years');
+        var vaccidate = moment(val.resource.date);
+        var diff = ago10years.diff(vaccidate, "days")
+        if (diff < 0){ return val }
+      })
+
+// locate the cvx code for Tdap and Td
+     var tetanuscvx = ['20', '106', '107', '146', '120', '130', '132', '170', '115', '35', '142', '112', '138', '09', '113', '196']
+     var tetanusArray = []
+      _.each(tdap10, function(val,index){
+        _.each(val.resource.vaccineCode.coding, function(v,i){
+          if (v.system === "http://hl7.org/fhir/sid/cvx"){
+            if (_.indexOf(tetanuscvx, v.code) > -1 ){
+              tetanusArray.push(v.code)}
+          }
+        })
+      })
+
+     if (tetanusArray.length > 0){
+          myApp.data.tdap.push('1')
+          }
+    }
+
+// Pneumococcal
+     function computePCV13VR(){
+
+// filter the time with limitaion 65+
+     pneumococcal65 = _.filter(myApp.requestData.immunization.entry, function(val,index){
+        var bday = moment(myApp.requestData.patient.birthDate, "YYYY-MM-DD")
+        var add65years = bday.add(65, 'years');
+        var vaccidate = moment(val.resource.date);
+        var diff = add65years.diff(vaccidate, "days")
+        if (diff < 0){ return val }
+      })
+
+// locate the cvx code for RZV and ZVL
+     var pcv13cvx = ['133', '100']
+     var pcv13Array = []
+      _.each(pneumococcal65, function(val,index){
+        _.each(val.resource.vaccineCode.coding, function(v,i){
+          if (v.system === "http://hl7.org/fhir/sid/cvx"){
+            if (_.indexOf(pcv13cvx, v.code) > -1 ){
+              pcv13Array.push(v.code)}
+          }
+        })
+      })
+
+     if (pcv13Array.length > 0){
+          myApp.data.pcv13.push('1')
+          }
+    }
+
+
+
+
+
+   }
+   function pregnant() {
+      // not recommend zoster, comment for flu
+      $("#flucomment").append("(Note LAIV should not be used)") 
+      myApp.data.zoster.push('2')
+      // tdap will be recommended to pregnant woman
+      $("#tdapcomment").html("1 dose Tdap during pregnancy, preferably in early part of gestational weeks 27–36")
+      myApp.data.tdap.push('3')                    
+   }
+
+
+	</script>
+
+</body>
+
+</html>
