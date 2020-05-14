@@ -3,3 +3,5 @@ Cerner app using EHR data to help the old people with vaccination decision
 
 
 Video introduction: https://youtu.be/nTlAOs8tyBY
+
+More information please find readme_wiser_vaccination_js_app.pdf
